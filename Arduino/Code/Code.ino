@@ -1,0 +1,44 @@
+#define ABSZERO 273.15
+#define MAXANALOGREAD 1023.0
+#define ANALOGPIN A1
+#define RELAY A2
+
+float temperature_NTC(float T0, float R0, float T1, float R1, float RV, float VA_VB)
+{
+  T0 += ABSZERO;
+  T1 += ABSZERO;
+  float B = (T0 * T1) / (T1 - T0) * log(R0 / R1);
+  float RN = RV * VA_VB / (1 - VA_VB);
+  return T0 * B / (B + T0 * log(RN / R0)) - ABSZERO;
+}
+
+float T0 = 25.0;
+float R0 = 10000.0;
+float T1 = 100.0;
+float R1 = 1000.0;
+float Vorwiderstand = 10000.0;
+
+float temp;
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(RELAY, OUTPUT);
+  digitalWrite(RELAY, HIGH);
+}
+
+void loop()
+{
+  int aValue = analogRead(ANALOGPIN);
+  temp = temperature_NTC(T0, R0, T1, R1, Vorwiderstand, aValue / MAXANALOGREAD);
+  Serial.println(temp);
+  if (temp >= 30)
+  {
+    digitalWrite(RELAY, LOW);
+  }
+  else if (temp <= 28)
+  {
+    digitalWrite(RELAY, HIGH);
+  }
+  delay(1500);
+}
