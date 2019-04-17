@@ -38,15 +38,20 @@ void loop()
   aValue = analogRead(ANALOGPIN);
   temp = temperature_NTC(T0, R0, T1, R1, Vorwiderstand, aValue / MAXANALOGREAD);
   cmd = "";
-  while (hc06.available() > 0) {
+  while (hc06.available() > 0)
+  {
     cmd += (char)hc06.read();
   }
-  if (cmd != "") {
-    if (cmd == "1") {
+  if (cmd != "")
+  {
+    if (cmd == "1")
+    {
       control = false;
       temperature = 0;
       digitalWrite(RELAY, LOW);
-    } else if (cmd == "0") {
+    }
+    else if (cmd == "0")
+    {
       control = false;
       temperature = 0;
       digitalWrite(RELAY, HIGH);
