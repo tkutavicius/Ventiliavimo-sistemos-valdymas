@@ -1,3 +1,5 @@
+#include <SoftwareSerial.h>
+SoftwareSerial hc06(0, 1);
 #define ABSZERO 273.15
 #define MAXANALOGREAD 1023.0
 #define ANALOGPIN A1
@@ -18,27 +20,53 @@ float T1 = 100.0;
 float R1 = 1000.0;
 float Vorwiderstand = 10000.0;
 
+int aValue;
 float temp;
+int temperature = 0;
+bool control = true;
+String cmd;
 
 void setup()
 {
-  Serial.begin(9600);
+  hc06.begin(9600);
   pinMode(RELAY, OUTPUT);
   digitalWrite(RELAY, HIGH);
 }
 
 void loop()
 {
-  int aValue = analogRead(ANALOGPIN);
+  aValue = analogRead(ANALOGPIN);
   temp = temperature_NTC(T0, R0, T1, R1, Vorwiderstand, aValue / MAXANALOGREAD);
-  Serial.println(temp);
-  if (temp >= 30)
-  {
-    digitalWrite(RELAY, LOW);
+  cmd = "";
+  while (hc06.available() > 0) {
+    cmd += (char)hc06.read();
   }
-  else if (temp <= 28)
-  {
-    digitalWrite(RELAY, HIGH);
+  if (cmd != "") {
+    if (cmd == "1") {
+      control = false;
+      temperature = 0;
+      digitalWrite(RELAY, LOW);
+    } else if (cmd == "0") {
+      control = false;
+      temperature = 0;
+      digitalWrite(RELAY, HIGH);
+    }
+    else
+    {
+      temperature = cmd.toInt();
+      control = true;
+    }
   }
-  delay(1500);
+  if (temperature > 0 && control)
+  {
+    if (temp >= temperature)
+    {
+      digitalWrite(RELAY, LOW);
+    }
+    else if (temp <= (temperature - 1))
+    {
+      digitalWrite(RELAY, HIGH);
+    }
+  }
+  delay(500);
 }
