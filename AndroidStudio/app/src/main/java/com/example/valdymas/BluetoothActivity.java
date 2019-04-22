@@ -17,19 +17,10 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class BluetoothActivity extends Activity {
-    // Debugging for LOGCAT
-    private static final String TAG = "DeviceListActivity";
-    private static final boolean D = true;
+    private static final String TAG = "BluetoothActivity";
 
-
-    // declare button for launching website and textview for connection status
-    Button tlbutton;
-    TextView textView1;
-
-    // EXTRA string to send on to mainactivity
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
 
-    // Member fields
     private BluetoothAdapter mBtAdapter;
     private ArrayAdapter<String> mPairedDevicesArrayAdapter;
 
@@ -46,21 +37,16 @@ public class BluetoothActivity extends Activity {
         //***************
         checkBTState();
 
-        // Initialize array adapter for paired devices
         mPairedDevicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item);
 
-        // Find and set up the ListView for paired devices
         ListView pairedListView = (ListView) findViewById(R.id.lv_paired_devices);
         pairedListView.setAdapter(mPairedDevicesArrayAdapter);
         pairedListView.setOnItemClickListener(mDeviceClickListener);
 
-        // Get the local Bluetooth adapter
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        // Get a set of currently paired devices and append to 'pairedDevices'
         Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
 
-        // Add previosuly paired devices to the array
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
                 mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
@@ -73,11 +59,9 @@ public class BluetoothActivity extends Activity {
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
 
             Toast.makeText(BluetoothActivity.this,"Jungiamasi...",Toast.LENGTH_SHORT).show();
-            // Get the device MAC address, which is the last 17 chars in the View
             String info = ((TextView) v).getText().toString();
             String address = info.substring(info.length() - 17);
 
-            // Make an intent to start next activity while taking an extra which is the MAC address.
             Intent i = new Intent(BluetoothActivity.this, MainActivity.class);
             i.putExtra(EXTRA_DEVICE_ADDRESS, address);
             startActivity(i);
@@ -85,8 +69,7 @@ public class BluetoothActivity extends Activity {
     };
 
     private void checkBTState() {
-        // Check device has Bluetooth and that it is turned on
-        mBtAdapter=BluetoothAdapter.getDefaultAdapter(); // CHECK THIS OUT THAT IT WORKS!!!
+        mBtAdapter=BluetoothAdapter.getDefaultAdapter();
         if(mBtAdapter==null) {
             Toast.makeText(getBaseContext(), "Įrenginys nepalaiko Bluetooth", Toast.LENGTH_SHORT).show();
         } else {

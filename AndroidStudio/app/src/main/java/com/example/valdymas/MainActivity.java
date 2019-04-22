@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -160,12 +159,10 @@ public class MainActivity extends AppCompatActivity {
     private class ConnectedThread extends Thread {
         private final OutputStream mmOutStream;
 
-        //creation of the connect thread
         public ConnectedThread(BluetoothSocket socket) {
             OutputStream tmpOut = null;
 
             try {
-                //Create I/O streams for connection
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) { }
 
@@ -178,11 +175,10 @@ public class MainActivity extends AppCompatActivity {
 
         //write method
         public void write(String input) {
-            byte[] msgBuffer = input.getBytes();           //converts entered String into bytes
+            byte[] msgBuffer = input.getBytes();
             try {
-                mmOutStream.write(msgBuffer);                //write bytes over BT connection via outstream
+                mmOutStream.write(msgBuffer);
             } catch (IOException e) {
-                //if you cannot write, close the application
                 Toast.makeText(getBaseContext(), "Prisijungimas nepavyko", Toast.LENGTH_LONG).show();
                 finish();
 
