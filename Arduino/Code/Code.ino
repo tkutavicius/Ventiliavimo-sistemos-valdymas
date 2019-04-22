@@ -46,13 +46,13 @@ void loop()
   }
   if (cmd != "")
   {
-    if (cmd == "1")
+    if (cmd == "N")
     {
       control = false;
       temperature = 0;
       digitalWrite(RELAY, LOW);
     }
-    else if (cmd == "0")
+    else if (cmd == "F")
     {
       control = false;
       temperature = 0;
