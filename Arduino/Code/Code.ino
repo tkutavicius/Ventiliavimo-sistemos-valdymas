@@ -29,6 +29,7 @@ String cmd;
 void setup()
 {
   hc06.begin(9600);
+  Serial.begin(9600);
   pinMode(RELAY, OUTPUT);
   digitalWrite(RELAY, HIGH);
 }
@@ -38,6 +39,7 @@ void loop()
   aValue = analogRead(ANALOGPIN);
   temp = temperature_NTC(T0, R0, T1, R1, Vorwiderstand, aValue / MAXANALOGREAD);
   cmd = "";
+  Serial.println(temp);
   while (hc06.available() > 0)
   {
     cmd += (char)hc06.read();
@@ -64,11 +66,11 @@ void loop()
   }
   if (temperature > 0 && control)
   {
-    if (temp >= temperature)
+    if ((temp - 0.5) >= temperature)
     {
       digitalWrite(RELAY, LOW);
     }
-    else if (temp <= (temperature - 1))
+    else if ((temp - 0.5) <= (temperature - 1))
     {
       digitalWrite(RELAY, HIGH);
     }
