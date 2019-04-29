@@ -26,11 +26,8 @@ public class MainActivity extends AppCompatActivity {
 
     private BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothSocket btSocket = null;
-
     private ConnectedThread mConnectedThread;
-
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-
     private static String address;
 
     @Override
