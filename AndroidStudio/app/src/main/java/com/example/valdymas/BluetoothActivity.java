@@ -35,9 +35,9 @@ public class BluetoothActivity extends Activity {
         super.onResume();
         checkBTState();
 
-        mPairedDevicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item);
+        mPairedDevicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.text_listview);
 
-        ListView pairedListView = (ListView) findViewById(R.id.lv_paired_devices);
+        ListView pairedListView = findViewById(R.id.lv_paired_devices);
         pairedListView.setAdapter(mPairedDevicesArrayAdapter);
         pairedListView.setOnItemClickListener(mDeviceClickListener);
 

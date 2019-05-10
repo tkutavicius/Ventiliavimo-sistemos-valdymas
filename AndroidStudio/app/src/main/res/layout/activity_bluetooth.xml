@@ -13,7 +13,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pasirinkite Bluetooth įrenginį" />
+            android:text="Pasirinkite Bluetooth įrenginį"
+            android:fontFamily="sans-serif-light"
+            android:textAlignment="center"
+            android:textColor="@android:color/background_light"
+            android:textSize="18sp" />
 
         <ListView
             android:id="@+id/lv_paired_devices"
@@ -25,7 +29,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Jei šiame sąraše įrenginio nėra - patikrinkite ar jis suporuotas!" />
+            android:text="Jei šiame sąraše įrenginio nėra - patikrinkite ar jis suporuotas!"
+            android:textAlignment="center"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="18sp" />
     </LinearLayout>
 
 </LinearLayout>
