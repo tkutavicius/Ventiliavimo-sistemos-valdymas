@@ -1,12 +1,5 @@
-Šio projekto tikslas atvaizduoti ventiliavimo sistemos valdymą android programėle.
-Puslapio viršuje yra duotas preliminarus programėlės dizaino kodas su keliomis fukcijomis.
-Projekto metu šis kodas bus pildomas norint sukurti optimaliausią programėlės dizainą, kuris tiktų norimiems klientams ir būtų patogus ir lengvas naudoti.
+Šio projekto tikslas - atvaizduoti ventiliavimo sistemos valdymą „Android“ programėle. Puslapio viršuje yra duotas programėlės kodas su keliomis fukcijomis bei „Arduino“ mikrovaldiklio valdymo kodu. Taip pat šioje platformoje sukurtas ir Wiki puslapis, kuriame yra visa informacija, kas buvo atlikta projekto metu, instrukcijos, kaip naudotis ir valdyti sistemą.
 
 Mūsų sukurta programėle klientas galės nustatyti ties kokia temperatūra norima, kad ventiliatorius įsijungtų automatiškai bei nuotoliniu būdu įjungti/išjungti minėtąjį ventiliatorių.
 
-Projekto komandą sudaro:
-Titas Kutavičius :	Programuotojas, testuotojas.
-Raminta Šniaukštaitė:	Projekto lyderė, testuotoja.
-Marius Pupelis:	Dizaineris, testuotojas.
-
-
+Projekto komandą sudaro: Titas Kutavičius: programuotojas, testuotojas. Raminta Šniaukštaitė:	projekto lyderė, testuotoja. Marius Pupelis:	dizaineris, testuotojas.
