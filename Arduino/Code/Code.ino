@@ -39,7 +39,9 @@ void loop()
   aValue = analogRead(ANALOGPIN);
   temp = temperature_NTC(T0, R0, T1, R1, Vorwiderstand, aValue / MAXANALOGREAD);
   cmd = "";
-  Serial.println(temp);
+  Serial.print('#');
+  Serial.print(temp);
+  Serial.println('~');
   while (hc06.available() > 0)
   {
     cmd += (char)hc06.read();
