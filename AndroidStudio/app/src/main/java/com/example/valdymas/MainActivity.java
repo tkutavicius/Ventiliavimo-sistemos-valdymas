@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -34,8 +36,11 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothSocket btSocket = null;
     private ConnectedThread mConnectedThread;
+    Handler bluetoothIn;
+    final int handlerState = 0;
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static String address;
+    private StringBuilder recDataString = new StringBuilder();
 
     private String path = Environment.getExternalStorageDirectory().toString() + File.separator + "Android" + File.separator + "data" + File.separator + "com.example.valdymas";
     private File hFile = new File(path + File.separator + "history.txt");
@@ -51,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         Switch onOffSwitch = findViewById(R.id.onOff);
         final FloatingActionButton fab = findViewById(R.id.fab);
         final TextView progress = findViewById(R.id.progress);
+        final TextView temperature = findViewById(R.id.temp);
         final SeekBar seekBar = findViewById(R.id.seekBar);
         final Button history = findViewById(R.id.history);
 
@@ -69,6 +75,25 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+        bluetoothIn = new Handler() {
+            public void handleMessage(android.os.Message msg) {
+                if (msg.what == handlerState) {                                     //if message is what we want
+                    String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
+                    recDataString.append(readMessage);                                      //keep appending to string until ~
+                    int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
+                    if (endOfLineIndex > 0) {                                           // make sure there data before
+                        if (recDataString.charAt(0) == '#')                             //if it starts with # we know it is what we are looking for
+                        {
+                            String sensor = recDataString.substring(1, endOfLineIndex);             //get sensor value from string between indices 1-5
+
+                            temperature.setText(" Sensor 0 Voltage = " + sensor + "V");    //update the textviews with sensor values
+                        }
+                        recDataString.delete(0, recDataString.length());                    //clear all string data
+                    }
+                }
+            }
+        };
 
         history.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -196,20 +221,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class ConnectedThread extends Thread {
+        private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
         public ConnectedThread(BluetoothSocket socket) {
+            InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
             try {
+                tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) { }
 
+            mmInStream = tmpIn;
             mmOutStream = tmpOut;
             Toast.makeText(MainActivity.this,"Prisijungimas sėkmingas!",Toast.LENGTH_LONG).show();
         }
 
         public void run() {
+            byte[] buffer = new byte[256];
+            int bytes;
+
+            // Keep looping to listen for received messages
+            while (true) {
+                try {
+                    bytes = mmInStream.read(buffer);            //read bytes from input buffer
+                    String readMessage = new String(buffer, 0, bytes);
+                    // Send the obtained bytes to the UI Activity via handler
+                    bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
+                } catch (IOException e) {
+                    break;
+                }
+            }
         }
 
         //write method
