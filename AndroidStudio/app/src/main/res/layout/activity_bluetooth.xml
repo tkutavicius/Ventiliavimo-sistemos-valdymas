@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/listgrad">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pasirinkite Bluetooth įrenginį"
+            android:fontFamily="sans-serif-light"
+            android:textAlignment="center"
+            android:textColor="@android:color/background_light"
+            android:textSize="18sp" />
+
+        <ListView
+            android:id="@+id/lv_paired_devices"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scrollbars="vertical"></ListView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Jei šiame sąraše įrenginio nėra - patikrinkite ar jis suporuotas!"
+            android:textAlignment="center"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+</LinearLayout>
