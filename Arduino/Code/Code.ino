@@ -1,3 +1,4 @@
+
 #include <SoftwareSerial.h>
 SoftwareSerial hc06(0, 1);
 #define ABSZERO 273.15
@@ -25,11 +26,13 @@ float temp;
 int temperature = 0;
 bool control = true;
 String cmd;
+int status;
 
 void setup()
 {
   hc06.begin(9600);
   Serial.begin(9600);
+  status = 0;
   pinMode(RELAY, OUTPUT);
   digitalWrite(RELAY, HIGH);
 }
@@ -39,26 +42,33 @@ void loop()
   aValue = analogRead(ANALOGPIN);
   temp = temperature_NTC(T0, R0, T1, R1, Vorwiderstand, aValue / MAXANALOGREAD);
   cmd = "";
-  Serial.println(temp);
+  Serial.print('#');
+  Serial.print(temp);
+  Serial.print('+');
+  Serial.print(status);
+  Serial.println('~');
   while (hc06.available() > 0)
   {
     cmd += (char)hc06.read();
   }
   if (cmd != "")
   {
+    Serial.println(cmd);
     if (cmd == "N")
     {
       control = false;
+      status = 1;
       temperature = 0;
       digitalWrite(RELAY, LOW);
     }
     else if (cmd == "F")
     {
       control = false;
+      status = 0;
       temperature = 0;
       digitalWrite(RELAY, HIGH);
     }
-    else
+    else if (cmd.toInt() > 1)
     {
       temperature = cmd.toInt();
       control = true;
