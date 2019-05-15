@@ -1,3 +1,4 @@
+
 #include <SoftwareSerial.h>
 SoftwareSerial hc06(0, 1);
 #define ABSZERO 273.15
@@ -43,15 +44,6 @@ void loop()
   cmd = "";
   Serial.print('#');
   Serial.print(temp);
-  Serial.print('+');
-  if (temperature != 0)
-  {
-    Serial.print(temperature);
-  }
-  else
-  {
-    Serial.print("20");
-  }
   Serial.print('+');
   Serial.print(status);
   Serial.println('~');
