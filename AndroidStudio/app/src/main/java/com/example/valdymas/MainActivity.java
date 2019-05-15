@@ -249,7 +249,6 @@ public class MainActivity extends AppCompatActivity {
             byte[] buffer = new byte[256];
             int bytes;
 
-            // Keep looping to listen for received messages
             while (true) {
                 try {
                     bytes = mmInStream.read(buffer);            //read bytes from input buffer
