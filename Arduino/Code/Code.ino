@@ -25,11 +25,13 @@ float temp;
 int temperature = 0;
 bool control = true;
 String cmd;
+int status;
 
 void setup()
 {
   hc06.begin(9600);
   Serial.begin(9600);
+  status = 0;
   pinMode(RELAY, OUTPUT);
   digitalWrite(RELAY, HIGH);
 }
@@ -41,6 +43,17 @@ void loop()
   cmd = "";
   Serial.print('#');
   Serial.print(temp);
+  Serial.print('+');
+  if (temperature != 0)
+  {
+    Serial.print(temperature);
+  }
+  else
+  {
+    Serial.print("20");
+  }
+  Serial.print('+');
+  Serial.print(status);
   Serial.println('~');
   while (hc06.available() > 0)
   {
@@ -51,12 +64,14 @@ void loop()
     if (cmd == "N")
     {
       control = false;
+      status = 1;
       temperature = 0;
       digitalWrite(RELAY, LOW);
     }
     else if (cmd == "F")
     {
       control = false;
+      status = 0;
       temperature = 0;
       digitalWrite(RELAY, HIGH);
     }
