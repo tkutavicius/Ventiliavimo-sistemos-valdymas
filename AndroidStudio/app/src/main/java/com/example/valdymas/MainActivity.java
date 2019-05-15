@@ -98,7 +98,11 @@ public class MainActivity extends AppCompatActivity {
                                 sensor = recDataString.substring(1, 6);
                                 temp = recDataString.substring(7, 9);
                                 stat = recDataString.substring(10, 11);
-                                boolean status = (Integer.parseInt(stat) == 0);
+                                boolean status = false;
+                                if(Integer.parseInt(stat) == 1)
+                                    status = true;
+                                else if (Integer.parseInt(stat) == 0)
+                                    status = false;
                                 temperature.setText("Aplinkos temperatūra: +" + sensor + "\u00B0C");
                                 onOffSwitch.setChecked(status);
                             }
@@ -107,7 +111,11 @@ public class MainActivity extends AppCompatActivity {
                                 sensor = recDataString.substring(1, 6);
                                 temp = recDataString.substring(7, 8);
                                 stat = recDataString.substring(9, 10);
-                                boolean status = (Integer.parseInt(stat) != 0);
+                                boolean status = false;
+                                if(Integer.parseInt(stat) == 1)
+                                    status = true;
+                                else if (Integer.parseInt(stat) == 0)
+                                    status = false;
                                 temperature.setText("Aplinkos temperatūra: +" + sensor + "\u00B0C");
                                 onOffSwitch.setChecked(status);
                             }
