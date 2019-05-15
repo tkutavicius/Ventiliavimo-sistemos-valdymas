@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -65,6 +66,19 @@ public class MainActivity extends AppCompatActivity {
         final TextView temperature = findViewById(R.id.temp);
         final SeekBar seekBar = findViewById(R.id.seekBar);
         final Button history = findViewById(R.id.history);
+
+        SharedPreferences mPrefs = getSharedPreferences("Settings", 0);
+        final SharedPreferences.Editor mEditor = mPrefs.edit();
+        boolean status = mPrefs.getBoolean("st", false);
+        int temp = mPrefs.getInt("tmp", 20);
+        if(status)
+        {
+            seekBar.setEnabled(false);
+            fab.setEnabled(false);
+        }
+        onOffSwitch.setChecked(status);
+        seekBar.setProgress(temp);
+        progress.setText("Nustatyta: + " + Integer.toString(temp) + "\u00B0C");
 
         File dir = new File(path);
         if(!dir.exists() && !dir.isDirectory())
@@ -137,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
                     fab.setEnabled(false);
                     mConnectedThread.write("N");
                     Write(hFile, "", sensor, 0);
+                    mEditor.putBoolean("st", true).commit();
                     Snackbar.make(findViewById(R.id.fab), "Sistema įjungta!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
@@ -144,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
                     fab.setEnabled(true);
                     mConnectedThread.write("F");
                     Write(hFile, "", sensor, 1);
+                    mEditor.putBoolean("st", false).commit();
                     Snackbar.make(findViewById(R.id.fab), "Sistema išjungta!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
@@ -156,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Write(hFile, Integer.toString(seekBar.getProgress()), sensor, 2);
                 mConnectedThread.write(Integer.toString(seekBar.getProgress()));
+                mEditor.putInt("tmp", seekBar.getProgress()).commit();
                 Snackbar.make(view, "Duomenys išsiųsti! Nustatyta temperatūra: " + Integer.toString(seekBar.getProgress()) + "\u00B0C", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
