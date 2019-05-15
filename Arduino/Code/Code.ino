@@ -61,6 +61,7 @@ void loop()
   }
   if (cmd != "")
   {
+    Serial.println(cmd);
     if (cmd == "N")
     {
       control = false;
@@ -75,7 +76,7 @@ void loop()
       temperature = 0;
       digitalWrite(RELAY, HIGH);
     }
-    else
+    else if (cmd.toInt() > 1)
     {
       temperature = cmd.toInt();
       control = true;
