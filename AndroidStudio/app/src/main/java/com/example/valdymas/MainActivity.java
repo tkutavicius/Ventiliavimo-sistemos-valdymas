@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static String address;
     private StringBuilder recDataString = new StringBuilder();
-    private String sensor;
+    private String sensor, temp, stat;
 
     private String path = Environment.getExternalStorageDirectory().toString() + File.separator + "Android" + File.separator + "data" + File.separator + "com.example.valdymas";
     private File hFile = new File(path + File.separator + "history.txt");
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Switch onOffSwitch = findViewById(R.id.onOff);
+        final Switch onOffSwitch = findViewById(R.id.onOff);
         final FloatingActionButton fab = findViewById(R.id.fab);
         final TextView progress = findViewById(R.id.progress);
         final TextView temperature = findViewById(R.id.temp);
@@ -88,13 +88,29 @@ public class MainActivity extends AppCompatActivity {
             public void handleMessage(android.os.Message msg) {
                 if (msg.what == handlerState) {                                     //if message is what we want
                     String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
-                    recDataString.append(readMessage);                                      //keep appending to string until ~
+                    recDataString.append(readMessage);
+                    int length = recDataString.length();//keep appending to string until ~
                     int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
                     if (endOfLineIndex > 0) {                                           // make sure there data before
                         if (recDataString.charAt(0) == '#')                             //if it starts with # we know it is what we are looking for
                         {
-                            sensor = recDataString.substring(1, endOfLineIndex);             //get sensor value from string between indices 1-5
-                            temperature.setText("Aplinkos temperatūra: +" + sensor + "\u00B0C");    //update the textviews with sensor values
+                            if (length == 14) {
+                                sensor = recDataString.substring(1, 6);
+                                temp = recDataString.substring(7, 9);
+                                stat = recDataString.substring(10, 11);
+                                boolean status = (Integer.parseInt(stat) == 0);
+                                temperature.setText("Aplinkos temperatūra: +" + sensor + "\u00B0C");
+                                onOffSwitch.setChecked(status);
+                            }
+                            else if (length == 11)
+                            {
+                                sensor = recDataString.substring(1, 6);
+                                temp = recDataString.substring(7, 8);
+                                stat = recDataString.substring(9, 10);
+                                boolean status = (Integer.parseInt(stat) != 0);
+                                temperature.setText("Aplinkos temperatūra: +" + sensor + "\u00B0C");
+                                onOffSwitch.setChecked(status);
+                            }
                         }
                         recDataString.delete(0, recDataString.length());                    //clear all string data
                     }
