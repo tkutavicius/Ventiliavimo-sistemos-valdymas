@@ -65,7 +65,6 @@ public class BluetoothActivity extends Activity {
         }
     }
 
-    // Set up on-click listener for the list (nicked this - unsure)
     private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
 
