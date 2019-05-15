@@ -37,6 +37,12 @@ public class BluetoothActivity extends Activity {
     }
 
     @Override
+    public void onBackPressed() {
+        int pid = android.os.Process.myPid();
+        android.os.Process.killProcess(pid);
+    }
+
+    @Override
     public void onResume()
     {
         super.onResume();

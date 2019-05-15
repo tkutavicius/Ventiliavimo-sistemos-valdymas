@@ -3,12 +3,17 @@ package com.example.valdymas;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -41,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static String address;
     private StringBuilder recDataString = new StringBuilder();
+    private String sensor;
 
     private String path = Environment.getExternalStorageDirectory().toString() + File.separator + "Android" + File.separator + "data" + File.separator + "com.example.valdymas";
     private File hFile = new File(path + File.separator + "history.txt");
@@ -61,12 +67,10 @@ public class MainActivity extends AppCompatActivity {
         final Button history = findViewById(R.id.history);
 
         File dir = new File(path);
-
         if(!dir.exists() && !dir.isDirectory())
         {
             dir.mkdirs();
         }
-
         if(!hFile.exists())
         {
             try {
@@ -75,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        this.registerReceiver(mReceiver, filter);
 
         bluetoothIn = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -85,9 +93,8 @@ public class MainActivity extends AppCompatActivity {
                     if (endOfLineIndex > 0) {                                           // make sure there data before
                         if (recDataString.charAt(0) == '#')                             //if it starts with # we know it is what we are looking for
                         {
-                            String sensor = recDataString.substring(1, endOfLineIndex);             //get sensor value from string between indices 1-5
-
-                            temperature.setText(" Sensor 0 Voltage = " + sensor + "V");    //update the textviews with sensor values
+                            sensor = recDataString.substring(1, endOfLineIndex);             //get sensor value from string between indices 1-5
+                            temperature.setText("Aplinkos temperatūra: +" + sensor + "\u00B0C");    //update the textviews with sensor values
                         }
                         recDataString.delete(0, recDataString.length());                    //clear all string data
                     }
@@ -129,14 +136,14 @@ public class MainActivity extends AppCompatActivity {
                     seekBar.setEnabled(false);
                     fab.setEnabled(false);
                     mConnectedThread.write("N");
-                    Write(hFile, "", 0);
+                    Write(hFile, "", sensor, 0);
                     Snackbar.make(findViewById(R.id.fab), "Sistema įjungta!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
                     seekBar.setEnabled(true);
                     fab.setEnabled(true);
                     mConnectedThread.write("F");
-                    Write(hFile, "", 1);
+                    Write(hFile, "", sensor, 1);
                     Snackbar.make(findViewById(R.id.fab), "Sistema išjungta!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
@@ -147,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Write(hFile, Integer.toString(seekBar.getProgress()), 2);
+                Write(hFile, Integer.toString(seekBar.getProgress()), sensor, 2);
                 mConnectedThread.write(Integer.toString(seekBar.getProgress()));
                 Snackbar.make(view, "Duomenys išsiųsti! Nustatyta temperatūra: " + Integer.toString(seekBar.getProgress()) + "\u00B0C", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
@@ -193,12 +200,12 @@ public class MainActivity extends AppCompatActivity {
         try
         {
             btSocket.connect();
-            Write(hFile, "", 3);
+            Write(hFile, "", sensor, 3);
         } catch (IOException e) {
             try
             {
                 btSocket.close();
-                Write(hFile, "", 4);
+                Write(hFile, "", sensor, 4);
             }
             catch (IOException e2)
             {
@@ -268,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static void Write(File file, String temp, int stat)
+    public static void Write(File file, String temp, String sensor, int stat)
     {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -286,7 +293,8 @@ public class MainActivity extends AppCompatActivity {
                 Save(file, data);
                 break;
             case 2:
-                info = dateformat.format(c.getTime()) + ": Nustatyta temperatūra +" + temp + "\u00B0C";
+                info = dateformat.format(c.getTime()) + ": Nustatyta temperatūra +" + temp + "\u00B0C. Aplinkos temperatūra: +" +
+                        sensor + "\u00B0C";
                 data = info.split("\n");
                 Save(file, data);
                 break;
@@ -297,6 +305,11 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 4:
                 info = dateformat.format(c.getTime()) + ": Inicijuotas nesėkmingas prisijungimas prie sistemos";
+                data = info.split("\n");
+                Save(file, data);
+                break;
+            case 5:
+                info = dateformat.format(c.getTime()) + ": Prarastas ryšys su Bluetooth įrenginiu";
                 data = info.split("\n");
                 Save(file, data);
                 break;
@@ -336,5 +349,42 @@ public class MainActivity extends AppCompatActivity {
             }
             catch (IOException e) {e.printStackTrace();}
         }
+    }
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+            if (device.ACTION_ACL_DISCONNECTED.equals(action)) {
+                Write(hFile, "", sensor, 5);
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+                builder1.setTitle("Prarastas ryšys!");
+                builder1.setMessage("Prarastas ryšys su prijungtu įrenginiu, prašome pasirinkti kitą!");
+                builder1.setPositiveButton(
+                        "Rinktis",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                startBluetoothActivity();
+                            }
+                        });
+                builder1.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        startBluetoothActivity();
+                    }
+                });
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
+            }
+
+        }
+    };
+
+    public void startBluetoothActivity()
+    {
+        Intent i = new Intent(MainActivity.this, BluetoothActivity.class);
+        startActivity(i);
     }
 }

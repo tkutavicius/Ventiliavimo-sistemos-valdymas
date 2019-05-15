@@ -1,6 +1,7 @@
 package com.example.valdymas;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
@@ -107,5 +108,12 @@ public class HistoryActivity extends AppCompatActivity {
         }
         catch (IOException e) {e.printStackTrace();}
         return array;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i = new Intent(HistoryActivity.this, BluetoothActivity.class);
+        startActivity(i);
     }
 }
