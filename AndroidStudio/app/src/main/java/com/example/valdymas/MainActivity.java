@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static String address;
     private StringBuilder recDataString = new StringBuilder();
-    private String sensor, temp, stat;
+    private String sensor;
 
     private String path = Environment.getExternalStorageDirectory().toString() + File.separator + "Android" + File.separator + "data" + File.separator + "com.example.valdymas";
     private File hFile = new File(path + File.separator + "history.txt");
@@ -86,41 +86,17 @@ public class MainActivity extends AppCompatActivity {
 
         bluetoothIn = new Handler() {
             public void handleMessage(android.os.Message msg) {
-                if (msg.what == handlerState) {                                     //if message is what we want
-                    String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
+                if (msg.what == handlerState) {
+                    String readMessage = (String) msg.obj;
                     recDataString.append(readMessage);
-                    int length = recDataString.length();//keep appending to string until ~
-                    int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
-                    if (endOfLineIndex > 0) {                                           // make sure there data before
-                        if (recDataString.charAt(0) == '#')                             //if it starts with # we know it is what we are looking for
+                    int endOfLineIndex = recDataString.indexOf("~");
+                    if (endOfLineIndex > 0) {
+                        if (recDataString.charAt(0) == '#')
                         {
-                            if (length == 14) {
-                                sensor = recDataString.substring(1, 6);
-                                temp = recDataString.substring(7, 9);
-                                stat = recDataString.substring(10, 11);
-                                boolean status = false;
-                                if(Integer.parseInt(stat) == 1)
-                                    status = true;
-                                else if (Integer.parseInt(stat) == 0)
-                                    status = false;
-                                temperature.setText("Aplinkos temperatūra: +" + sensor + "\u00B0C");
-                                onOffSwitch.setChecked(status);
-                            }
-                            else if (length == 11)
-                            {
-                                sensor = recDataString.substring(1, 6);
-                                temp = recDataString.substring(7, 8);
-                                stat = recDataString.substring(9, 10);
-                                boolean status = false;
-                                if(Integer.parseInt(stat) == 1)
-                                    status = true;
-                                else if (Integer.parseInt(stat) == 0)
-                                    status = false;
-                                temperature.setText("Aplinkos temperatūra: +" + sensor + "\u00B0C");
-                                onOffSwitch.setChecked(status);
-                            }
+                            sensor = recDataString.substring(1, 6);
+                            temperature.setText("Aplinkos temperatūra: +" + sensor + "\u00B0C");
                         }
-                        recDataString.delete(0, recDataString.length());                    //clear all string data
+                        recDataString.delete(0, recDataString.length());
                     }
                 }
             }
