@@ -259,7 +259,6 @@ public class MainActivity extends AppCompatActivity {
 
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
-            Toast.makeText(MainActivity.this,"Prisijungimas sėkmingas!",Toast.LENGTH_LONG).show();
         }
 
         public void run() {
